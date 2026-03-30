@@ -377,6 +377,7 @@ nav{
 .feat.dark{background:var(--nav)}
 .feat.dark:hover{background:var(--nav-hover)}
 .feat.wide{grid-column:span 2}
+.feat.full-width{grid-column:1/-1}
 .feat-icon{
   width:44px;height:44px;
   background:var(--accent-faint);border-radius:var(--radius);
@@ -657,7 +658,7 @@ footer{background:var(--text);padding:60px 0 36px}
   .wrap{padding:0 24px}
   .section-intro{grid-template-columns:1fr}
   .steps{grid-template-columns:1fr 1fr}
-  .feat-grid{grid-template-columns:1fr}.feat.wide{grid-column:span 1}
+  .feat-grid{grid-template-columns:1fr}.feat.wide{grid-column:span 1}.feat.full-width{grid-column:span 1}
   .simple-grid{grid-template-columns:1fr}
   .test-stats{grid-template-columns:1fr}
   .pricing-grid{grid-template-columns:1fr}
@@ -967,10 +968,29 @@ footer{background:var(--text);padding:60px 0 36px}
         <p>Approval rates, completeness averages, attendance by member, training hours against state requirements — your annual data, organized. One click generates a professional Word document for your SHPO annual report.</p>
       </div>
 
-      <div class="feat wide">
-        <div class="feat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21v-2a8 8 0 0116 0v2"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
-        <h3>Commission Assistant</h3>
-        <p>A searchable AI assistant trained on your commission's own data — sessions, decisions, members, and violations. Ask it "what conditions did we put on 248 Oak Ave in 2023?" and get an answer in seconds.</p>
+      <div class="feat dark full-width">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:center">
+          <div>
+            <div class="feat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21v-2a8 8 0 0116 0v2"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+            <h3>Commission Assistant</h3>
+            <p>A searchable AI assistant trained on your commission's own data — sessions, decisions, members, and violations. Ask it "what conditions did we put on 248 Oak Ave in 2023?" and get an answer in seconds.</p>
+          </div>
+          <div style="background:rgba(255,255,255,0.06);border-radius:var(--radius);padding:20px">
+            <div style="font-family:var(--font-body);font-size:9px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:12px">Example query</div>
+            <div style="background:rgba(255,255,255,0.05);border-radius:6px;padding:14px;margin-bottom:10px">
+              <div style="font-family:var(--font-body);font-size:11px;color:rgba(255,255,255,0.6);line-height:1.7;font-style:italic">"What conditions did we put on 248 Oak Ave in 2023?"</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.05);border-radius:6px;padding:14px">
+              <div style="font-family:var(--font-body);font-size:9px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:8px">Answer</div>
+              <div style="font-family:var(--font-body);font-size:10px;color:rgba(255,255,255,0.6);line-height:1.85">
+                COA approved with conditions on June 12, 2023:<br>
+                · Replacement windows shall match existing profiles<br>
+                · Cedar clapboard siding, no vinyl permitted<br>
+                · Color to match Benjamin Moore HC-172
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
     </div>
