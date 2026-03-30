@@ -4,45 +4,51 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Privacy Policy — DistrictDesk</title>
-<meta name="description" content="DistrictDesk privacy policy. How we collect, use, and protect your data.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="alternate icon" href="/favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#F5F0E8;--nav:#1B3A2D;--text:#2C1810;--text-secondary:#5A4A3A;
-  --card-bg:#FDFAF5;--border:#C8B89A;--border-light:#DDD4C4;
+  --bg:#F5F0E8;--nav:#1B3A2D;--nav-hover:#2D5A45;--accent:#8B6914;
+  --text:#2C1810;--text-secondary:#5A4A3A;--card-bg:#FDFAF5;
+  --border:#C8B89A;--border-light:#DDD4C4;
   --font-heading:'Playfair Display',serif;--font-body:'Source Serif 4',serif;
-  --radius:8px;
+  --radius:8px;--shadow:0 2px 8px rgba(0,0,0,0.08);
 }
 html{scroll-behavior:smooth}
 body{font-family:var(--font-body);background:var(--bg);color:var(--text);line-height:1.65;font-size:16px}
-h1,h2,h3{font-family:var(--font-heading);font-weight:400;line-height:1.25;color:var(--nav)}
-p,li{color:var(--text-secondary);line-height:1.75}
-a{color:var(--nav);text-decoration:underline}
-a:hover{color:#2D5A45}
+h1,h2,h3,h4{font-family:var(--font-heading);font-weight:400;line-height:1.15;color:var(--nav)}
+p{color:var(--text-secondary);line-height:1.75}
+a{color:inherit;text-decoration:none}
 nav{
-  height:68px;display:flex;align-items:center;padding:0 52px;
+  position:fixed;top:0;left:0;right:0;z-index:200;height:68px;
+  display:flex;align-items:center;justify-content:space-between;padding:0 52px;
   background:rgba(245,240,232,0.95);backdrop-filter:blur(18px);
   border-bottom:1px solid var(--border-light);
 }
 .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
-.nav-mark{
-  width:36px;height:36px;background:var(--nav);border-radius:var(--radius);
-  display:flex;align-items:center;justify-content:center;
-}
+.nav-mark{width:36px;height:36px;background:var(--nav);border-radius:var(--radius);display:flex;align-items:center;justify-content:center}
 .nav-mark svg{width:20px;height:20px}
 .nav-name{font-family:var(--font-heading);font-size:21px;font-weight:600;color:var(--text)}
-.container{max-width:720px;margin:0 auto;padding:60px 24px 80px}
-h1{font-size:2rem;margin-bottom:8px}
-.updated{font-size:0.9rem;color:var(--text-secondary);margin-bottom:40px}
-h2{font-size:1.35rem;margin:36px 0 12px}
-p{margin-bottom:16px}
-ul{margin:0 0 16px 24px}
-li{margin-bottom:6px}
-footer{
-  border-top:1px solid var(--border);padding:28px 52px;
-  text-align:center;font-size:0.85rem;color:var(--text-secondary);
+.content{max-width:720px;margin:0 auto;padding:120px 52px 80px}
+.content h1{font-size:36px;margin-bottom:8px}
+.content .updated{font-family:var(--font-body);font-size:13px;color:var(--text-secondary);margin-bottom:40px}
+.content h2{font-size:22px;margin-top:36px;margin-bottom:12px}
+.content p{margin-bottom:16px;font-size:15px}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-body);font-size:14px;color:var(--accent);margin-bottom:32px;transition:color 0.2s}
+.back-link:hover{color:var(--nav)}
+footer{background:var(--text);padding:36px 0}
+.foot-wrap{max-width:720px;margin:0 auto;padding:0 52px;display:flex;justify-content:space-between;align-items:center}
+.foot-copy{font-family:var(--font-body);font-size:12px;color:rgba(255,255,255,0.2)}
+.foot-legal{display:flex;gap:18px}
+.foot-legal a{font-family:var(--font-body);font-size:12px;color:rgba(255,255,255,0.2);transition:color 0.2s}
+.foot-legal a:hover{color:rgba(255,255,255,0.5)}
+@media(max-width:960px){
+  nav{padding:0 20px}
+  .content{padding:100px 24px 60px}
+  .foot-wrap{padding:0 24px;flex-direction:column;gap:12px;text-align:center}
 }
 </style>
 </head>
@@ -57,45 +63,37 @@ footer{
     <span class="nav-name">DistrictDesk</span>
   </a>
 </nav>
-
-<div class="container">
+<div class="content">
+  <a href="/" class="back-link">← Back to districtdesk.org</a>
   <h1>Privacy Policy</h1>
   <p class="updated">Last updated: March 2026</p>
 
-  <p>DistrictDesk ("we," "us," or "our") operates the districtdesk.org website and the DistrictDesk application. This policy explains how we collect, use, and protect your information.</p>
-
   <h2>Information We Collect</h2>
-  <p>Through the marketing site contact form, we collect:</p>
-  <ul>
-    <li>Your name</li>
-    <li>Your email address</li>
-    <li>Your commission name</li>
-  </ul>
-  <p>Within the DistrictDesk application, commission administrators provide information about applications, properties, and meeting proceedings as part of normal use.</p>
+  <p>When you contact us through our website, we collect your name, commission name, and email address.</p>
+  <p>When you use the DistrictDesk portal, we store meeting session data, motion records, and commission member information that you provide.</p>
 
   <h2>How We Use Your Information</h2>
-  <p>We use the information collected through the contact form solely to respond to your inquiry and, if requested, to set up a demo or account. We do not use your contact information for unsolicited marketing.</p>
+  <p>To respond to demo requests and support questions.</p>
+  <p>To operate the portal service for your commission.</p>
+  <p>We do not sell or share your information with third parties except as required to operate the service (email delivery via Resend, AI processing via Anthropic).</p>
 
-  <h2>Data Sharing</h2>
-  <p>We do not sell, rent, or share your personal information with third parties. Each commission's data within the application is fully isolated and is never shared with other commissions or external parties.</p>
+  <h2>Data Storage</h2>
+  <p>Portal data is stored on Railway cloud infrastructure.</p>
+  <p>AI processing is performed by Anthropic's API. See Anthropic's privacy policy at anthropic.com/privacy.</p>
 
-  <h2>Application Data</h2>
-  <ul>
-    <li>All commission data is stored in isolated, per-commission databases.</li>
-    <li>Audio recordings are never stored. When meetings are transcribed, only the resulting text transcript is retained.</li>
-    <li>Data is encrypted in transit and at rest.</li>
-  </ul>
-
-  <h2>Cookies</h2>
-  <p>The marketing site uses only minimal cookies required by Cloudflare for analytics and security. We do not use advertising cookies or third-party tracking scripts.</p>
-
-  <h2>Data Retention</h2>
-  <p>Contact form submissions are retained only as long as needed to respond to your inquiry. Application data is retained for the duration of your commission's active subscription. Upon cancellation, data may be exported by the commission administrator and is deleted from our systems within 90 days.</p>
-
-  <h2>Contact Us</h2>
-  <p>If you have questions about this privacy policy or wish to request deletion of your data, please reach out via our <a href="/#contact">contact form</a> or email us at hello@districtdesk.org.</p>
+  <h2>Contact</h2>
+  <p>Questions about this policy: <a href="mailto:info@districtdesk.org" style="color:var(--accent)">info@districtdesk.org</a></p>
 </div>
-
-<footer>&copy; 2026 DistrictDesk &middot; districtdesk.org</footer>
+<footer>
+  <div class="foot-wrap">
+    <div class="foot-copy">© 2026 DistrictDesk · districtdesk.org</div>
+    <div class="foot-legal">
+      <a href="/privacy.html">Privacy</a>
+      <a href="/terms.html">Terms</a>
+      <a href="/security.html">Security</a>
+      <a href="/disclaimer.html">Disclaimer</a>
+    </div>
+  </div>
+</footer>
 </body>
 </html>

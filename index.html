@@ -3,8 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DistrictDesk — Historic Preservation Commission Software</title>
-<meta name="description" content="DistrictDesk helps volunteer historic preservation commissions prepare for meetings, record every motion, and produce draft minutes — without the paperwork burden.">
+<title>DistrictDesk — COA Review & Meeting Software for Historic Preservation Commissions</title>
+<meta name="description" content="DistrictDesk helps volunteer historic preservation commissions review COA applications, record motions, and generate minutes — automatically. Set up in 30 minutes. From $299/year.">
+<link rel="canonical" href="https://districtdesk.org/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://districtdesk.org/">
+<meta property="og:title" content="DistrictDesk — Future Technology to Preserve the Past">
+<meta property="og:description" content="Purpose-built software for historic preservation commissions. COA review, meeting management, and minutes generation — in one place. From $299/year.">
+<meta property="og:image" content="https://districtdesk.org/og-image.png">
+<meta property="og:site_name" content="DistrictDesk">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="DistrictDesk — Future Technology to Preserve the Past">
+<meta name="twitter:description" content="Purpose-built software for historic preservation commissions. COA review, meeting management, and minutes generation — in one place.">
+<meta name="twitter:image" content="https://districtdesk.org/og-image.png">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="alternate icon" href="/favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet">
 <style>
@@ -140,6 +153,15 @@ nav{
   animation:up 0.7s ease 0.1s both;
 }
 .hero h1 em{font-style:italic;color:var(--accent)}
+.hero-workflow-tag{
+  font-family:var(--font-body);
+  font-size:16px;
+  font-weight:400;
+  color:var(--accent);
+  letter-spacing:0.04em;
+  margin-bottom:16px;
+  margin-top:-6px;
+}
 .hero-lead{
   font-size:17px;color:var(--text-secondary);
   line-height:1.75;max-width:480px;
@@ -572,32 +594,66 @@ footer{background:var(--text);padding:60px 0 36px}
 .reveal{opacity:0;transform:translateY(20px);transition:opacity 0.6s ease,transform 0.6s ease}
 .reveal.visible{opacity:1;transform:translateY(0)}
 
-/* ── HAMBURGER MENU ── */
-.nav-toggle{display:none;background:none;border:none;cursor:pointer;padding:8px}
-.nav-toggle svg{width:24px;height:24px;stroke:var(--text);stroke-width:2;fill:none;stroke-linecap:round}
-.mobile-menu{
-  display:none;position:fixed;top:68px;left:0;right:0;
-  background:var(--bg);border-bottom:1px solid var(--border-light);
-  padding:16px 24px;box-shadow:var(--shadow-lg);z-index:199;
-  flex-direction:column;gap:12px;
+/* ── MOBILE MENU ── */
+.nav-hamburger{
+  display:none;
+  background:none;border:none;cursor:pointer;
+  color:var(--text);padding:4px;
 }
-.mobile-menu.open{display:flex}
-.mobile-menu a{font-family:var(--font-body);font-size:15px;color:var(--text-secondary);padding:8px 0;border-bottom:1px solid var(--border-light);transition:color 0.2s}
-.mobile-menu a:last-child{border:none}
-.mobile-menu a:hover{color:var(--nav)}
-.mobile-menu .btn{text-align:center;justify-content:center;margin-top:4px}
+.mobile-menu{
+  position:fixed;inset:0;z-index:300;
+  background:rgba(44,24,16,0.6);
+  backdrop-filter:blur(4px);
+  opacity:0;pointer-events:none;
+  transition:opacity 0.25s;
+}
+.mobile-menu.open{opacity:1;pointer-events:all}
+.mobile-menu-inner{
+  position:absolute;top:0;right:0;
+  width:min(320px,85vw);height:100%;
+  background:var(--card-bg);padding:24px;
+  transform:translateX(100%);
+  transition:transform 0.3s ease;
+}
+.mobile-menu.open .mobile-menu-inner{transform:translateX(0)}
+.mobile-menu-close{
+  display:flex;margin-left:auto;
+  background:none;border:none;cursor:pointer;
+  color:var(--text);padding:4px;margin-bottom:32px;
+}
+.mobile-nav{display:flex;flex-direction:column;gap:0}
+.mobile-nav a{
+  font-family:var(--font-heading);
+  font-size:26px;font-weight:400;
+  color:var(--nav);text-decoration:none;
+  padding:14px 0;
+  border-bottom:1px solid var(--border-light);
+  transition:color 0.2s;
+}
+.mobile-nav a:hover{color:var(--accent)}
+.mobile-nav-cta{
+  margin-top:20px !important;
+  background:var(--accent) !important;
+  color:white !important;
+  border-radius:6px !important;
+  padding:14px 20px !important;
+  border-bottom:none !important;
+  text-align:center;
+  font-family:var(--font-body) !important;
+  font-size:15px !important;
+  font-weight:500 !important;
+}
 
 /* ── RESPONSIVE ── */
 @media(max-width:960px){
-  nav{padding:0 20px}
-  .nav-links{display:none}
+  .nav-hamburger{display:flex}
   .nav-right{display:none}
-  .nav-toggle{display:block}
+  nav{padding:0 20px}.nav-links{display:none}
   .hero{grid-template-columns:1fr;min-height:auto}
   .hero-left{padding:72px 24px 56px}
   .hero-right{display:none}
   .stat-inner{grid-template-columns:1fr 1fr;padding:0 24px;gap:24px}
-  .stat-item{border-right:none;padding:12px 0}
+  .stat-item{border-right:none}
   .wrap{padding:0 24px}
   .section-intro{grid-template-columns:1fr}
   .steps{grid-template-columns:1fr 1fr}
@@ -606,30 +662,8 @@ footer{background:var(--text);padding:60px 0 36px}
   .test-stats{grid-template-columns:1fr}
   .pricing-grid{grid-template-columns:1fr}
   .faq-grid{grid-template-columns:1fr}
-  .foot-inner{grid-template-columns:1fr 1fr;gap:32px}
+  .foot-inner{grid-template-columns:1fr 1fr}
   .foot-bottom{flex-direction:column;gap:12px;text-align:center}
-  .section{padding:56px 0}
-  .hero h1{font-size:clamp(32px,8vw,52px)}
-  .section-h{font-size:clamp(26px,5vw,40px)}
-  .final-cta h2{font-size:clamp(28px,6vw,44px)}
-  .hero-actions{flex-direction:column;gap:10px}
-  .hero-actions .btn{text-align:center;justify-content:center}
-  .final-actions{flex-direction:column;gap:10px;align-items:center}
-  .test-quote{font-size:clamp(18px,4vw,26px)}
-}
-@media(max-width:600px){
-  nav{padding:0 16px;height:60px}
-  .hero-left{padding:60px 16px 40px}
-  .wrap{padding:0 16px}
-  .stat-inner{grid-template-columns:1fr;gap:16px;padding:0 16px}
-  .steps{grid-template-columns:1fr}
-  .foot-inner{grid-template-columns:1fr;gap:24px}
-  .foot-legal{gap:12px}
-  .simple-big{font-size:44px}
-  .tier{padding:28px 20px}
-  .step{padding:24px 20px}
-  .feat{padding:24px 20px}
-  .faq-item{padding:24px 20px}
 }
 </style>
 </head>
@@ -655,16 +689,32 @@ footer{background:var(--text);padding:60px 0 36px}
     <a href="#contact" class="btn btn-outline">Request a demo</a>
     <a href="#pricing" class="btn btn-nav-solid">See pricing</a>
   </div>
-  <button class="nav-toggle" onclick="document.getElementById('mobile-menu').classList.toggle('open')" aria-label="Menu">
-    <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  <button class="nav-hamburger" id="nav-hamburger" aria-label="Open navigation menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="22" height="22">
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
   </button>
 </nav>
-<div class="mobile-menu" id="mobile-menu">
-  <a href="#how-it-works" onclick="this.parentElement.classList.remove('open')">How it works</a>
-  <a href="#features" onclick="this.parentElement.classList.remove('open')">Features</a>
-  <a href="#pricing" onclick="this.parentElement.classList.remove('open')">Pricing</a>
-  <a href="#questions" onclick="this.parentElement.classList.remove('open')">Questions</a>
-  <a href="#contact" class="btn btn-primary" onclick="this.parentElement.classList.remove('open')">Request a demo</a>
+
+<!-- MOBILE MENU OVERLAY -->
+<div id="mobile-menu" class="mobile-menu">
+  <div class="mobile-menu-inner">
+    <button class="mobile-menu-close" id="mobile-menu-close" aria-label="Close menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="22" height="22">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+    <nav class="mobile-nav">
+      <a href="#how-it-works">How it works</a>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#questions">Questions</a>
+      <a href="#contact" class="mobile-nav-cta">Request a demo</a>
+    </nav>
+  </div>
 </div>
 
 <!-- HERO -->
@@ -675,7 +725,8 @@ footer{background:var(--text);padding:60px 0 36px}
         <span class="hero-dot"></span>
         Built for historic preservation commissions
       </div>
-      <h1>Prepared before.<br><em>Organized</em> during.<br>Done when you leave.</h1>
+      <h1>Future technology<br>to preserve <em>the past.</em></h1>
+      <p class="hero-workflow-tag">Prepared before. Organized during. Done when you leave.</p>
       <p class="hero-lead">DistrictDesk connects every part of your commission's work — application review before the meeting, motion recording during it, and a minutes draft the moment it ends. Nothing re-entered twice. Nothing written from memory.</p>
       <div class="hero-actions">
         <a href="#contact" class="btn btn-primary btn-lg">Schedule a free demo</a>
@@ -684,7 +735,7 @@ footer{background:var(--text);padding:60px 0 36px}
       <div class="proof-list">
         <div class="proof-item">
           <div class="proof-check"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1B3A2D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          Live with a New Jersey pilot commission since 2025
+          Live at Mullica Hill Historic District, Harrison Township NJ since 2025
         </div>
         <div class="proof-item">
           <div class="proof-check"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1B3A2D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -706,7 +757,7 @@ footer{background:var(--text);padding:60px 0 36px}
         <div class="pf-url">districtdesk.org</div>
       </div>
       <div class="pf-nav">
-        <div class="pf-brand">Greenfield HPC <small>COA Portal</small></div>
+        <div class="pf-brand">Mullica Hill HPC <small>COA Portal</small></div>
         <div class="pf-tab on">
           <svg viewBox="0 0 14 14"><rect x="1.5" y="1.5" width="11" height="11" rx="1.5"/><path d="M4.5 5h5M4.5 7.5h3.5"/></svg>Review
         </div>
@@ -725,8 +776,8 @@ footer{background:var(--text);padding:60px 0 36px}
         <div class="pf-row">
           <div class="pf-card">
             <div class="pfc-label">COA 1 · AI Review</div>
-            <div class="pfc-h">247 Elm Street</div>
-            <div class="pfc-sub">Whitfield House · Block 12, Lot 5 · <span style="color:#2D6A4F;font-weight:500">Contributing</span></div>
+            <div class="pfc-h">14 South Main St</div>
+            <div class="pfc-sub">Gaunt House · Block 65, Lot 18 · <span style="color:#2D6A4F;font-weight:500">Contributing</span></div>
             <span class="pfc-badge badge-minor">Incomplete — Minor Work</span>
             <div class="pfc-bar-row"><span>Completeness Score</span><span style="color:#2D6A4F;font-weight:600">72%</span></div>
             <div class="pfc-bar"><div class="pfc-fill" style="width:72%"><span>72%</span></div></div>
@@ -738,23 +789,23 @@ footer{background:var(--text);padding:60px 0 36px}
             </div>
           </div>
           <div class="pf-card">
-            <div class="pfc-label">Meeting · April 15, 2026</div>
+            <div class="pfc-label">Meeting · March 26, 2026</div>
             <div class="pfc-h" style="margin-bottom:8px">Roll Call</div>
-            <div class="pfc-member"><div class="pfc-mbox on"></div><span class="pfc-mname">R. Thompson</span><span class="pfc-mrole">Chair</span></div>
-            <div class="pfc-member"><div class="pfc-mbox on"></div><span class="pfc-mname">M. Chen</span><span class="pfc-mrole">Vice Chair</span></div>
-            <div class="pfc-member"><div class="pfc-mbox on"></div><span class="pfc-mname">J. Kowalski</span><span class="pfc-mrole">Member</span></div>
-            <div class="pfc-member"><div class="pfc-mbox"></div><span class="pfc-mname">L. Okafor</span><span class="pfc-mrole">Member</span></div>
-            <div class="pfc-member"><div class="pfc-mbox on"></div><span class="pfc-mname">S. Navarro</span><span class="pfc-mrole">Member</span></div>
+            <div class="pfc-member"><div class="pfc-mbox on"></div><span class="pfc-mname">Paul Showers</span><span class="pfc-mrole">President</span></div>
+            <div class="pfc-member"><div class="pfc-mbox on"></div><span class="pfc-mname">Ernie Miller</span><span class="pfc-mrole">Vice President</span></div>
+            <div class="pfc-member"><div class="pfc-mbox on"></div><span class="pfc-mname">Dave Tinny</span><span class="pfc-mrole">Member</span></div>
+            <div class="pfc-member"><div class="pfc-mbox"></div><span class="pfc-mname">Jason Flowers</span><span class="pfc-mrole">Member</span></div>
+            <div class="pfc-member"><div class="pfc-mbox on"></div><span class="pfc-mname">Sharron Patterson</span><span class="pfc-mrole">Member</span></div>
             <div class="pfc-quorum">4 present (4 voting) · Quorum: ✓ Yes</div>
           </div>
         </div>
         <div class="pf-card">
-          <div class="pfc-label">Minutes Draft — AI Generated · April 15, 2026</div>
+          <div class="pfc-label">Minutes Draft — AI Generated · March 26, 2026</div>
           <div class="pfc-minutes">
-            <strong>GREENFIELD HPC · COA REVIEW MEETING · April 15, 2026</strong><br>
-            Members Present: R. Thompson, M. Chen, J. Kowalski, S. Navarro<br><br>
-            <strong>Application 1:</strong> 247 Elm St — T. Bennett · Window replacement<br>
-            Motion by R. Thompson to approve. Seconded by M. Chen. Carried 4-0.<br>
+            <strong>MULLICA HILL HPC · COA REVIEW MEETING · March 26, 2026</strong><br>
+            Members Present: P. Showers, E. Miller, D. Tinny, S. Patterson<br><br>
+            <strong>Application 1:</strong> 14 S. Main St — Jane Smith · Window replacement<br>
+            Motion by P. Showers to approve. Seconded by E. Miller. Carried 4-0.<br>
             <em>Conditions: Work shall match existing profiles in kind…</em>
           </div>
           <div class="pfc-mbtns">
@@ -775,11 +826,11 @@ footer{background:var(--text);padding:60px 0 36px}
       <div class="stat-l">Historic districts in the US — none with a tool purpose-built for this workflow</div>
     </div>
     <div class="stat-item">
-      <div class="stat-n">&lt;30min</div>
+      <div class="stat-n">30 min</div>
       <div class="stat-l">From first login to ready for your next meeting on the Assisted plan</div>
     </div>
     <div class="stat-item">
-      <div class="stat-n">&lt;$500</div>
+      <div class="stat-n">Under $500</div>
       <div class="stat-l">Per year — less than one hour of municipal attorney time</div>
     </div>
     <div class="stat-item">
@@ -858,7 +909,7 @@ footer{background:var(--text);padding:60px 0 36px}
           <div style="background:rgba(255,255,255,0.06);border-radius:var(--radius);padding:20px">
             <div style="font-family:var(--font-body);font-size:9px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:10px">Live output</div>
             <div style="background:rgba(255,255,255,0.05);border-radius:6px;padding:12px;margin-bottom:10px">
-              <div style="display:flex;justify-content:space-between;font-family:var(--font-body);font-size:9px;color:rgba(255,255,255,0.45);margin-bottom:5px"><span>247 Elm St · Completeness</span><span style="color:var(--accent-light);font-weight:600">72/100</span></div>
+              <div style="display:flex;justify-content:space-between;font-family:var(--font-body);font-size:9px;color:rgba(255,255,255,0.45);margin-bottom:5px"><span>14 S. Main St · Completeness</span><span style="color:var(--accent-light);font-weight:600">72/100</span></div>
               <div style="height:16px;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden"><div style="height:100%;width:72%;background:var(--accent-light);border-radius:8px;display:flex;align-items:center;padding-left:6px"><span style="font-family:var(--font-body);font-size:8px;font-weight:600;color:#fff">72%</span></div></div>
             </div>
             <div style="font-family:var(--font-body);font-size:9px;color:rgba(255,255,255,0.3);margin-bottom:6px;letter-spacing:0.06em;text-transform:uppercase">Missing items</div>
@@ -960,7 +1011,11 @@ footer{background:var(--text);padding:60px 0 36px}
         </ul>
       </div>
       <div class="simple-card accent-card">
-        <div class="simple-big">?</div>
+        <div style="width:52px;height:52px;background:var(--forest-pale, var(--nav-pale));border-radius:var(--radius);display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--nav)" stroke-width="1.5" stroke-linecap="round" width="26" height="26">
+            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+          </svg>
+        </div>
         <h3>A real person answers your questions</h3>
         <p>On Assisted and Full-Service plans, you email a person who knows your commission's setup — not a support ticket system. Questions about how to record a particular motion, how to find a past decision, how to run the SHPO report — answered directly.</p>
       </div>
@@ -975,8 +1030,8 @@ footer{background:var(--text);padding:60px 0 36px}
       <div class="test-mark">"</div>
       <p class="test-quote">We used to spend the evening after every meeting writing up minutes and chasing applicants for missing documents. Now we walk out with a draft ready and every motion on the record. It changed how we operate completely.</p>
       <div class="test-attr">
-        <strong>Commission Secretary</strong>
-        <span>DistrictDesk pilot commission · New Jersey<br>Using DistrictDesk since 2025</span>
+        <strong>Anita McCann</strong>, Secretary
+        <span>Harrison Township Historic Preservation Commission · Mullica Hill Historic District, NJ<br>DistrictDesk pilot commission since 2025</span>
       </div>
       <div class="test-stats">
         <div class="ts-item"><div class="ts-n">2,300+</div><div class="ts-l">Historic districts in the US — most still running on Word documents and shared email chains</div></div>
@@ -1091,7 +1146,7 @@ footer{background:var(--text);padding:60px 0 36px}
       <a href="#contact" class="btn btn-primary btn-lg">Schedule a free demo</a>
       <a href="#pricing" class="btn btn-outline btn-lg">See pricing first</a>
     </div>
-    <p class="final-fine">No commitment, no sales pressure. Questions? <a href="#contact">hello@districtdesk.org</a> — a real person responds.</p>
+    <p class="final-fine">No commitment, no sales pressure. Questions? <a href="#contact">info@districtdesk.org</a> — a real person responds.</p>
   </div>
 </section>
 
@@ -1113,7 +1168,7 @@ footer{background:var(--text);padding:60px 0 36px}
           </div>
           <div style="margin-bottom:18px">
             <label style="display:block;font-family:var(--font-body);font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px">Commission Name</label>
-            <input type="text" name="commission" required placeholder="e.g. Greenfield Historic Preservation Commission" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:6px;font-family:var(--font-body);font-size:14px;background:var(--bg);color:var(--text)">
+            <input type="text" name="commission" required placeholder="e.g. Mullica Hill Historic Preservation Commission" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:6px;font-family:var(--font-body);font-size:14px;background:var(--bg);color:var(--text)">
           </div>
           <div style="margin-bottom:18px">
             <label style="display:block;font-family:var(--font-body);font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px">Email</label>
@@ -1125,6 +1180,10 @@ footer{background:var(--text);padding:60px 0 36px}
           </div>
           <button type="submit" class="btn btn-primary btn-lg" style="width:100%;justify-content:center">Send Message</button>
         </form>
+        <div id="form-success" style="display:none;background:var(--nav-pale);border:1px solid var(--status-complete);border-radius:var(--radius);padding:24px;text-align:center;margin-top:16px;">
+          <p style="color:var(--status-complete);font-size:16px;font-weight:500;margin-bottom:6px;">✓ Message sent</p>
+          <p style="color:var(--text-secondary);font-size:14px;margin:0;">We'll get back to you within one business day.</p>
+        </div>
         <p style="text-align:center;font-family:var(--font-body);font-size:12px;color:#aaa;margin-top:16px">No sales pressure. We're a small team — you'll hear from a real person.</p>
       </div>
     </div>
@@ -1138,7 +1197,7 @@ footer{background:var(--text);padding:60px 0 36px}
       <div>
         <div class="foot-brand">DistrictDesk</div>
         <p class="foot-desc">Purpose-built software for historic preservation commissions. COA review, meeting management, and minutes generation — in one place.</p>
-        <a href="#contact" class="foot-email">hello@districtdesk.org</a>
+        <a href="#contact" class="foot-email">info@districtdesk.org</a>
       </div>
       <div class="foot-col">
         <h5>Product</h5>
@@ -1152,8 +1211,8 @@ footer{background:var(--text);padding:60px 0 36px}
       <div class="foot-col">
         <h5>Resources</h5>
         <ul>
-          <li><a href="#contact">Setup guide</a></li>
-          <li><a href="https://www.nps.gov/clg/" target="_blank">CLG grant info</a></li>
+          <li><a href="#">Setup guide</a></li>
+          <li><a href="#">CLG grant eligibility</a></li>
           <li><a href="https://www.nps.gov/subjects/historicpreservation/standards-and-guidelines.htm" target="_blank">Secretary of Interior Standards</a></li>
           <li><a href="https://www.napc.us" target="_blank">NAPC</a></li>
         </ul>
@@ -1192,6 +1251,98 @@ window.addEventListener('scroll',()=>{
   document.getElementById('main-nav').style.boxShadow =
     window.scrollY > 40 ? '0 2px 16px rgba(44,24,16,0.1)' : 'none';
 },{passive:true});
+
+// Mobile menu
+const hamburger = document.getElementById('nav-hamburger');
+const mobileMenu = document.getElementById('mobile-menu');
+const mobileClose = document.getElementById('mobile-menu-close');
+
+function openMobileMenu() {
+  mobileMenu.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeMobileMenu() {
+  mobileMenu.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+if (hamburger) hamburger.addEventListener('click', openMobileMenu);
+if (mobileClose) mobileClose.addEventListener('click', closeMobileMenu);
+if (mobileMenu) mobileMenu.addEventListener('click', (e) => {
+  if (e.target === mobileMenu) closeMobileMenu();
+});
+document.querySelectorAll('.mobile-nav a').forEach(a => a.addEventListener('click', () => {
+  closeMobileMenu();
+}));
+
+// Contact form success state
+const contactForm = document.querySelector('#contact form');
+if (contactForm) {
+  contactForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = contactForm.querySelector('button[type="submit"]');
+    const originalText = btn.textContent;
+    btn.textContent = 'Sending...';
+    btn.disabled = true;
+    try {
+      const response = await fetch(contactForm.action, {
+        method: 'POST',
+        body: new FormData(contactForm),
+        headers: { 'Accept': 'application/json' }
+      });
+      if (response.ok) {
+        contactForm.style.display = 'none';
+        document.getElementById('form-success').style.display = 'block';
+      } else {
+        btn.textContent = 'Try again';
+        btn.disabled = false;
+      }
+    } catch (err) {
+      btn.textContent = 'Try again';
+      btn.disabled = false;
+    }
+  });
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "DistrictDesk",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web browser",
+  "description": "AI-assisted software for historic preservation commissions. COA review, meeting management, minutes generation, and SHPO reporting.",
+  "url": "https://districtdesk.org",
+  "offers": [
+    {
+      "@type": "Offer",
+      "name": "Self-Serve",
+      "price": "299",
+      "priceCurrency": "USD",
+      "description": "Annual subscription with full feature access and self-guided setup"
+    },
+    {
+      "@type": "Offer",
+      "name": "Assisted",
+      "price": "499",
+      "priceCurrency": "USD",
+      "description": "Annual subscription with 30-minute onboarding call and assisted setup"
+    },
+    {
+      "@type": "Offer",
+      "name": "Full-Service",
+      "price": "799",
+      "priceCurrency": "USD",
+      "description": "Annual subscription with full white-glove setup and phone support"
+    }
+  ],
+  "publisher": {
+    "@type": "Organization",
+    "name": "DistrictDesk",
+    "url": "https://districtdesk.org",
+    "email": "info@districtdesk.org"
+  }
+}
 </script>
 </body>
 </html>
