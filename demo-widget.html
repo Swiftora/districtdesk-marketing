@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rivermont HPC — DistrictDesk Portal Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700&family=Source+Serif+4:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5F0E8;--nav:#1B3A2D;--nav-hover:#2D5A45;
+  --accent:#8B6914;--accent-light:#C4A44A;
+  --text:#2C1810;--text-secondary:#5A4A3A;
+  --card-bg:#FDFAF5;--border:#C8B89A;--border-light:#DDD4C4;
+  --status-complete:#2D6A4F;--status-incomplete:#9B2335;
+  --status-minor:#B5770D;--status-major:#8B3A0F;--status-indeterminate:#5A5A5A;
+  --conf-high:#2D6A4F;--conf-medium:#B5770D;--conf-low:#9B2335;
+  --approved:#2D6A4F;--approved-cond:#B5770D;--tabled:#5A5A5A;--denied:#9B2335;
+  --font-heading:'Playfair Display',serif;--font-body:'Source Serif 4',serif;
+  --font-ui:'DM Sans',sans-serif;--radius:8px;
+  --shadow:0 2px 8px rgba(0,0,0,0.08);
+}
+body{margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:transparent;font-family:var(--font-body)}
+
+/* ── Widget shell ── */
+.widget{width:960px;height:600px;border-radius:0;overflow:hidden;position:relative;background:var(--bg);display:flex;flex-direction:column}
+
+/* ── Progress bar (very top) ── */
+.progress-track{height:3px;background:rgba(196,164,74,0.15);position:relative;flex-shrink:0}
+.progress-fill{height:100%;width:0;background:var(--accent-light);transition:none}
+
+/* ── Browser chrome ── */
+.chrome{height:36px;background:#2d2d2d;display:flex;align-items:center;padding:0 16px;flex-shrink:0;position:relative}
+.chrome-dots{display:flex;gap:6px}
+.chrome-dot{width:12px;height:12px;border-radius:50%}
+.chrome-dot.r{background:#ff5f57}.chrome-dot.y{background:#febc2e}.chrome-dot.g{background:#28c840}
+.chrome-url{position:absolute;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.1);border-radius:4px;padding:3px 14px;font:12px var(--font-ui);color:rgba(255,255,255,.45)}
+.pause-indicator{position:absolute;right:16px;font:11px var(--font-ui);color:rgba(255,255,255,.35);display:none}
+
+/* ── Nav bar ── */
+.portal-nav{height:42px;background:var(--nav);display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,0.2)}
+.nav-brand{display:flex;align-items:baseline;gap:8px}
+.nav-brand h1{font-family:var(--font-heading);font-size:.88rem;font-weight:600;color:#fff;white-space:nowrap}
+.nav-brand span{font-size:.68rem;color:rgba(255,255,255,.7)}
+.nav-tabs{display:flex;gap:2px}
+.nav-tab{background:transparent;border:none;color:rgba(255,255,255,.55);font-family:var(--font-body);font-size:.62rem;font-weight:500;padding:4px 8px;cursor:default;border-radius:4px 4px 0 0;border-bottom:2px solid transparent;display:flex;flex-direction:column;align-items:center;gap:1px;transition:all .2s}
+.nav-tab svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav-tab.active{color:#fff;border-bottom-color:var(--accent-light);background:rgba(255,255,255,.1)}
+
+/* ── Advisory strip ── */
+.advisory-strip{background:#f5f0e8;border-bottom:1px solid #e0d8c8;padding:3px 12px;text-align:center;font-size:9px;color:#8B6914;flex-shrink:0;font-family:var(--font-body)}
+
+/* ── Scene area ── */
+.scene-area{flex:1;overflow:hidden;position:relative}
+.scene{position:absolute;inset:0;padding:12px 16px;overflow:hidden;opacity:0;transform:translateY(8px);transition:opacity .28s ease-out,transform .28s ease-out;pointer-events:none}
+.scene.active{opacity:1;transform:translateY(0);pointer-events:auto}
+.scene.exiting{opacity:0;transform:translateY(-6px);transition-duration:.18s}
+
+/* ── Scene controls ── */
+.controls{height:48px;background:var(--nav);display:flex;align-items:center;justify-content:center;gap:20px;flex-shrink:0;position:relative}
+.controls-center{display:flex;flex-direction:column;align-items:center;gap:4px}
+.scene-title{font:10px var(--font-ui);color:rgba(255,255,255,.5);letter-spacing:.03em}
+.scene-dots{display:flex;gap:10px;align-items:center}
+.scene-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3);cursor:pointer;transition:all .2s;border:none}
+.scene-dot.active{width:10px;height:10px;background:var(--accent-light)}
+.ctrl-arrow{background:none;border:none;cursor:pointer;padding:4px}
+.ctrl-arrow svg{width:20px;height:20px;stroke:#fff;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.dot-labels{display:flex;gap:10px;align-items:center}
+.dot-label{font:8px var(--font-ui);color:rgba(255,255,255,.3);text-align:center;min-width:8px}
+.dot-label.active{color:rgba(255,255,255,.6)}
+
+/* ── Common scene elements ── */
+.s-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;box-shadow:var(--shadow)}
+.s-card h2{font-family:var(--font-heading);font-size:.88rem;color:var(--nav);margin-bottom:6px}
+.s-card h3{font-family:var(--font-heading);font-size:.78rem;color:var(--nav);margin-bottom:4px}
+.s-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;height:100%}
+.s-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.s-badge-complete{background:rgba(45,106,79,.12);color:var(--status-complete)}
+.s-badge-incomplete{background:rgba(155,35,53,.12);color:var(--status-incomplete)}
+.s-badge-minor{background:rgba(181,119,13,.12);color:var(--status-minor)}
+.s-badge-medium{background:rgba(181,119,13,.12);color:var(--conf-medium)}
+.s-badge-contributing{background:#d4edda;color:#155724}
+.s-badge-confirmed{background:rgba(45,106,79,.12);color:#155724}
+.ai-banner{background:#fef3cd;border-left:3px solid #856404;border-radius:4px;padding:6px 10px;font-size:9px;font-weight:600;color:#856404;line-height:1.5;margin-bottom:8px}
+.ai-banner span{font-weight:400}
+.btn-s{font-family:var(--font-body);font-weight:500;padding:6px 14px;border-radius:6px;cursor:default;border:none;font-size:.72rem;display:inline-flex;align-items:center;gap:4px}
+.btn-s-primary{background:var(--accent);color:#fff}
+.btn-s-outline{background:transparent;border:2px solid var(--accent);color:var(--accent)}
+
+/* ── Scene 1: Review ── */
+.completeness-track{height:18px;background:#eee;border-radius:8px;overflow:hidden;margin:4px 0 6px}
+.completeness-fill{height:100%;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.62rem;color:#fff;min-width:30px;transition:width .8s ease-out}
+.missing-item{display:flex;align-items:center;gap:6px;font-size:.65rem;color:var(--text-secondary);padding:2px 0}
+.missing-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.issue-item{display:flex;align-items:flex-start;gap:6px;font-size:.65rem;color:var(--text);padding:2px 0;line-height:1.4}
+.issue-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:4px}
+.q-item{font-size:.63rem;color:var(--text-secondary);padding:3px 0 3px 10px;border-left:2px solid var(--border-light);line-height:1.4}
+@keyframes pulse-btn{0%,100%{box-shadow:0 0 0 0 rgba(139,105,20,.3)}50%{box-shadow:0 0 0 6px rgba(139,105,20,0)}}
+
+/* ── Scene 2: Property ── */
+.prop-map{height:120px;background:#6b8f71;border-radius:var(--radius);overflow:hidden;position:relative;margin:6px 0}
+.prop-map-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:40px 40px}
+.map-building{position:absolute;background:rgba(30,50,30,.35);border-radius:2px}
+.map-pin{position:absolute;left:50%;top:45%;transform:translate(-50%,-100%)}
+.map-pin-shape{width:18px;height:24px;background:var(--nav);border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;position:relative;display:flex;align-items:center;justify-content:center}
+.map-pin-shape::after{content:'';width:6px;height:6px;background:#fff;border-radius:50%;margin-top:-3px}
+.map-label{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font:9px var(--font-ui);color:#fff;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.hist-row{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border-light);font-size:.65rem}
+.hist-row:last-child{border-bottom:none}
+.hist-date{color:var(--text-secondary);min-width:55px}
+.hist-desc{flex:1;color:var(--text)}
+.ext-links{display:flex;gap:6px;margin-top:6px}
+.ext-link{display:flex;align-items:center;gap:4px;padding:5px 10px;background:#fff;border:1px solid var(--border);border-radius:var(--radius);font-size:.6rem;font-weight:500;color:var(--text);text-decoration:none}
+
+/* ── Scene 3: Meeting ── */
+.att-row{display:flex;align-items:center;gap:6px;padding:3px 4px;font-size:.65rem;border-bottom:1px solid #f0ebe3}
+.att-check{width:13px;height:13px;border-radius:3px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.att-check.checked{background:var(--nav);border-color:var(--nav)}
+.att-check.checked svg{stroke:#fff}
+.att-check svg{width:9px;height:9px;stroke:transparent;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.att-name{flex:1}.att-role{color:var(--text-secondary);font-style:italic;font-size:.6rem}
+.step-indicator{display:flex;align-items:center;gap:4px;padding:3px 0;font-size:.62rem}
+.step-num{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-ui);font-size:.55rem;font-weight:700;flex-shrink:0}
+.step-done{background:var(--approved);color:#fff}
+.step-active{background:var(--accent);color:#fff}
+.step-pending{background:var(--border-light);color:var(--text-secondary)}
+.outcome-btns{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:4px 0}
+.o-btn{font-family:var(--font-body);font-weight:600;padding:6px 8px;border:1.5px solid var(--border);border-radius:var(--radius);background:#fff;color:var(--text);font-size:.6rem;text-align:center}
+.o-btn.selected{background:var(--approved);color:#fff;border-color:var(--approved)}
+@keyframes pulse-outcome{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+.cond-chip{display:flex;align-items:center;gap:4px;padding:3px 8px;background:rgba(139,105,20,.05);border:1px solid var(--border-light);border-radius:5px;font-size:.58rem;margin-bottom:3px}
+
+/* ── Scene 4: Minutes ── */
+.minutes-box{width:100%;font-family:var(--font-body);font-size:.62rem;line-height:1.7;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);background:#fff;color:var(--text);resize:none;overflow:hidden;white-space:pre-wrap}
+
+/* ── Scene 5: KPI ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.kpi-card{background:#fff;border:1px solid var(--border-light);border-radius:var(--radius);padding:10px;text-align:center}
+.kpi-num{font-family:var(--font-heading);font-size:1.6rem;font-weight:700;color:var(--nav)}
+.kpi-label{font-family:var(--font-ui);font-size:.52rem;text-transform:uppercase;letter-spacing:.04em;color:var(--text-secondary);margin-top:2px}
+.outcome-bar{display:flex;height:18px;border-radius:9px;overflow:hidden;margin-bottom:6px}
+.outcome-bar div{display:flex;align-items:center;justify-content:center;color:#fff;font-size:.5rem;font-weight:600}
+.legend{display:flex;gap:10px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:.58rem;color:var(--text-secondary)}
+.legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="widget" id="widget">
+
+  <!-- Progress bar -->
+  <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+
+  <!-- Browser chrome -->
+  <div class="chrome">
+    <div class="chrome-dots"><div class="chrome-dot r"></div><div class="chrome-dot y"></div><div class="chrome-dot g"></div></div>
+    <div class="chrome-url">rivermont-hpc.districtdesk.org</div>
+    <div class="pause-indicator" id="pause-ind">
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="rgba(255,255,255,.5)"><rect x="1" y="1" width="3" height="8" rx=".5"/><rect x="6" y="1" width="3" height="8" rx=".5"/></svg>
+    </div>
+  </div>
+
+  <!-- Nav bar -->
+  <div class="portal-nav">
+    <div class="nav-brand"><h1>Rivermont HPC</h1><span>COA Portal</span></div>
+    <div class="nav-tabs" id="nav-tabs">
+      <button class="nav-tab active" data-tab="review"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg>Review</button>
+      <button class="nav-tab" data-tab="property"><svg viewBox="0 0 24 24"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21V13h6v8"/></svg>Property</button>
+      <button class="nav-tab" data-tab="meeting"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="7" r="3"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M17 11a4 4 0 014 4v2"/></svg>Meeting</button>
+      <button class="nav-tab" data-tab="minutes"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>Minutes</button>
+      <button class="nav-tab" data-tab="references"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><path d="M8 7h8M8 11h5"/></svg>References</button>
+      <button class="nav-tab" data-tab="library"><svg viewBox="0 0 24 24"><path d="M3 3h7v7H3z"/><path d="M14 3h7v7h-7z"/><path d="M3 14h7v7H3z"/><path d="M17 14v7"/><path d="M14 17.5h7"/></svg>Library</button>
+      <button class="nav-tab" data-tab="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings</button>
+    </div>
+  </div>
+
+  <!-- Advisory strip -->
+  <div class="advisory-strip">Advisory tool &middot; AI reviews are informational only &middot; All decisions rest with the commission</div>
+
+  <!-- ═══════ SCENE AREA ═══════ -->
+  <div class="scene-area">
+
+    <!-- ── Scene 1: AI COA Review ── -->
+    <div class="scene active" id="scene-1">
+      <div class="s-cols">
+        <!-- Left column -->
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div class="s-card" style="padding-bottom:6px">
+            <div style="font-size:.55rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-secondary);margin-bottom:2px">COA-2026-014</div>
+            <div style="font-family:var(--font-heading);font-size:.88rem;color:var(--nav);font-weight:600">312 Elm Street</div>
+            <div style="font-size:.63rem;color:var(--text-secondary);margin-bottom:4px">Alcott House &middot; Block 8, Lot 14</div>
+            <span class="s-badge s-badge-contributing">Contributing</span>
+          </div>
+          <div class="s-card">
+            <div style="font-family:var(--font-heading);font-size:.72rem;color:var(--nav);margin-bottom:2px">Application Completeness</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:.65rem;margin-bottom:2px">
+              <span>Completeness Score</span>
+              <span style="color:var(--accent);font-weight:600" id="score-text">0%</span>
+            </div>
+            <div class="completeness-track">
+              <div class="completeness-fill" id="completeness-fill" style="width:0%;background:var(--conf-medium)">0%</div>
+            </div>
+            <div class="missing-item"><div class="missing-dot" style="background:var(--status-minor)"></div>Material/product specifications not provided</div>
+            <div class="missing-item"><div class="missing-dot" style="background:var(--status-minor)"></div>No drawings, plans, or sketches included</div>
+            <div class="missing-item"><div class="missing-dot" style="background:var(--status-minor)"></div>Only one photo (front) — need all elevations</div>
+          </div>
+          <div class="ai-banner" style="margin-bottom:0">
+            <svg viewBox="0 0 16 16" width="10" height="10" style="vertical-align:middle;margin-right:3px;fill:#856404"><path d="M8 1L1 14h14L8 1zm0 4v4m0 2v1"/></svg>
+            AI-Generated Review — Advisory Only<br>
+            <span>This review is produced by artificial intelligence for preparation purposes. It does not constitute a professional preservation review, legal determination, or official commission finding. All decisions rest with the commission.</span>
+          </div>
+        </div>
+        <!-- Right column -->
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div class="s-card" id="review-result-card" style="flex:1;opacity:0">
+            <div style="display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap">
+              <span class="s-badge s-badge-incomplete">Incomplete</span>
+              <span class="s-badge s-badge-minor">Minor Work (Likely)</span>
+              <span class="s-badge s-badge-medium">Medium Confidence</span>
+            </div>
+            <div style="font-family:var(--font-heading);font-size:.75rem;color:var(--nav);margin-bottom:4px">Key Issues</div>
+            <div id="issues-list">
+              <div class="issue-item" style="opacity:0"><div class="issue-dot"></div>Replacement material not specified — wood, composite, or fiberglass requires different review standards under SOI guidelines</div>
+              <div class="issue-item" style="opacity:0"><div class="issue-dot"></div>No dimensioned drawings showing column profile, base, and capital details</div>
+              <div class="issue-item" style="opacity:0"><div class="issue-dot"></div>Single photograph insufficient — commission needs all four elevations</div>
+            </div>
+            <div style="font-family:var(--font-heading);font-size:.72rem;color:var(--nav);margin:6px 0 3px">Recommended Questions</div>
+            <div class="q-item">What material is proposed for the replacement columns?</div>
+            <div class="q-item">Will the column profile, base, and capital match the existing historic character exactly?</div>
+            <div class="q-item">Can you provide drawings showing the column dimensions and profile detail?</div>
+            <div style="margin-top:8px">
+              <div class="btn-s btn-s-primary" id="draft-email-btn-demo">
+                <svg viewBox="0 0 16 16" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="3" width="12" height="10" rx="1"/><path d="M2 4l6 5 6-5"/></svg>
+                Draft Email to Applicant
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Scene 2: Property Intelligence ── -->
+    <div class="scene" id="scene-2">
+      <div class="s-card" style="margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div style="font-family:var(--font-heading);font-size:.92rem;color:var(--nav);font-weight:600">312 Elm Street</div>
+            <div style="font-size:.65rem;color:var(--text-secondary);font-style:italic">Alcott House</div>
+            <div style="font-size:.6rem;color:var(--text-secondary);margin-top:2px">Block 8, Lot 14 &middot; Rivermont Historic District, Rivermont VT</div>
+          </div>
+          <div style="display:flex;gap:4px;flex-shrink:0">
+            <span class="s-badge s-badge-contributing">Contributing</span>
+            <span class="s-badge s-badge-confirmed">Confirmed</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="prop-map" id="prop-map">
+        <div class="prop-map-grid"></div>
+        <div class="map-building" style="width:48px;height:28px;top:35%;left:42%;transform:rotate(-3deg);opacity:0"></div>
+        <div class="map-building" style="width:32px;height:22px;top:55%;left:60%;transform:rotate(2deg);opacity:0"></div>
+        <div class="map-building" style="width:40px;height:20px;top:25%;left:65%;transform:rotate(-1deg);opacity:0"></div>
+        <div class="map-building" style="width:28px;height:34px;top:50%;left:30%;transform:rotate(1deg);opacity:0"></div>
+        <div class="map-pin"><div class="map-pin-shape"></div></div>
+        <div class="map-label">312 Elm St &middot; Rivermont, VT</div>
+      </div>
+
+      <div class="s-card" style="padding:8px 12px">
+        <h3 style="margin-bottom:4px">Decision History</h3>
+        <div id="hist-rows">
+          <div class="hist-row" style="opacity:0"><span class="hist-date">Sep 2022</span><span class="s-badge s-badge-complete" style="font-size:.55rem">Approved</span><span class="hist-desc">Roof repair &middot; 5-0</span></div>
+          <div class="hist-row" style="opacity:0"><span class="hist-date">Apr 2020</span><span class="s-badge s-badge-minor" style="font-size:.55rem">Approved w/ Conditions</span><span class="hist-desc">Window replacement &middot; 4-1</span></div>
+          <div class="hist-row" style="opacity:0"><span class="hist-date">Nov 2018</span><span class="s-badge s-badge-complete" style="font-size:.55rem">Approved</span><span class="hist-desc">Fence installation &middot; 6-0</span></div>
+        </div>
+      </div>
+      <div class="ext-links" id="ext-links">
+        <div class="ext-link"><svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M9 6.5v3a1 1 0 01-1 1H3a1 1 0 01-1-1v-5a1 1 0 011-1h3M7 1.5h3.5V5M5.5 6.5L10.5 1.5"/></svg>VT Historic Sites</div>
+        <div class="ext-link"><svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M9 6.5v3a1 1 0 01-1 1H3a1 1 0 01-1-1v-5a1 1 0 011-1h3M7 1.5h3.5V5M5.5 6.5L10.5 1.5"/></svg>District Ordinance</div>
+        <div class="ext-link"><svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M9 6.5v3a1 1 0 01-1 1H3a1 1 0 01-1-1v-5a1 1 0 011-1h3M7 1.5h3.5V5M5.5 6.5L10.5 1.5"/></svg>Municipality</div>
+      </div>
+    </div>
+
+    <!-- ── Scene 3: Meeting In Progress ── -->
+    <div class="scene" id="scene-3">
+      <div class="s-cols" style="grid-template-columns:38% 62%">
+        <!-- Left: Roll Call -->
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div class="s-card">
+            <h3>Roll Call / Attendance</h3>
+            <div style="font-size:.6rem;color:var(--text-secondary);margin-bottom:4px">Tuesday, April 15, 2026</div>
+            <div class="att-row"><div class="att-check checked"><svg viewBox="0 0 10 10"><polyline points="2 5 4.5 7.5 8 3"/></svg></div><span class="att-name">C. Hargrove</span><span class="att-role">Chair</span></div>
+            <div class="att-row"><div class="att-check checked"><svg viewBox="0 0 10 10"><polyline points="2 5 4.5 7.5 8 3"/></svg></div><span class="att-name">M. Delacroix</span><span class="att-role">Vice Chair</span></div>
+            <div class="att-row"><div class="att-check checked"><svg viewBox="0 0 10 10"><polyline points="2 5 4.5 7.5 8 3"/></svg></div><span class="att-name">B. Okafor</span><span class="att-role">Secretary</span></div>
+            <div class="att-row"><div class="att-check checked"><svg viewBox="0 0 10 10"><polyline points="2 5 4.5 7.5 8 3"/></svg></div><span class="att-name">S. Novak</span><span class="att-role">Member</span></div>
+            <div class="att-row"><div class="att-check checked"><svg viewBox="0 0 10 10"><polyline points="2 5 4.5 7.5 8 3"/></svg></div><span class="att-name">T. Whitfield</span><span class="att-role">Member</span></div>
+            <div class="att-row"><div class="att-check"><svg viewBox="0 0 10 10"><polyline points="2 5 4.5 7.5 8 3"/></svg></div><span class="att-name">R. Patel</span><span class="att-role">Alternate</span></div>
+            <div style="margin-top:5px;font-size:.62rem;color:var(--status-complete);font-weight:600">5 present (5 voting) &mdash; Quorum: Yes</div>
+          </div>
+          <div class="s-card" style="padding:8px 12px">
+            <div style="font-size:.6rem;color:var(--text-secondary)">March 18, 2026 minutes &mdash; <span style="color:var(--approved);font-weight:600">Approved</span></div>
+          </div>
+        </div>
+        <!-- Right: Motion Recorder -->
+        <div class="s-card" style="display:flex;flex-direction:column">
+          <div style="font-size:.65rem;font-weight:600;color:var(--text-secondary);margin-bottom:2px">COA-2026-014 &middot; 312 Elm Street</div>
+          <div style="font-size:.6rem;color:var(--text-secondary);margin-bottom:6px">J. Morrow &middot; Front porch column replacement</div>
+
+          <div id="motion-steps">
+            <div class="step-indicator" style="opacity:0"><span class="step-num step-done">1</span><span style="flex:1">Application Completeness</span><span style="color:var(--approved);font-weight:600">Complete</span></div>
+            <div class="step-indicator" style="opacity:0"><span class="step-num step-done">2</span><span style="flex:1">Work Classification</span><span style="color:var(--approved);font-weight:600">Minor Work</span></div>
+            <div class="step-indicator" style="opacity:0"><span class="step-num step-active">3</span><span style="flex:1;font-weight:600">Commission Decision</span></div>
+          </div>
+
+          <div class="outcome-btns" style="margin-top:4px">
+            <div class="o-btn selected" id="approved-btn">Approved</div>
+            <div class="o-btn">Approved with Conditions</div>
+            <div class="o-btn">Tabled</div>
+            <div class="o-btn">Denied</div>
+          </div>
+
+          <div class="cond-chip"><span style="flex:1">Match existing profile in wood only</span><span style="color:var(--denied);font-weight:700;cursor:default;font-size:.7rem">&times;</span></div>
+          <div class="cond-chip"><span style="flex:1">Material samples required</span><span style="color:var(--denied);font-weight:700;cursor:default;font-size:.7rem">&times;</span></div>
+
+          <div style="display:flex;gap:16px;align-items:center;margin:4px 0;font-size:.65rem">
+            <div>Yes: <span style="font-weight:700;font-size:.8rem" id="vote-yes">0</span></div>
+            <div>No: <span style="font-weight:700;font-size:.8rem">0</span></div>
+          </div>
+          <div style="font-size:.58rem;color:var(--text-secondary);margin-bottom:6px">Rivermont HPC &middot; Mover: C. Hargrove &middot; Seconder: M. Delacroix</div>
+          <div class="btn-s btn-s-primary" style="text-align:center;width:100%;justify-content:center">Record Motion</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Scene 4: Minutes Draft ── -->
+    <div class="scene" id="scene-4">
+      <div class="ai-banner">
+        <svg viewBox="0 0 16 16" width="10" height="10" style="vertical-align:middle;margin-right:3px;fill:#856404"><path d="M8 1L1 14h14L8 1zm0 4v4m0 2v1"/></svg>
+        AI-Generated Draft — Requires Review<br>
+        <span>This minutes draft was generated by AI from your recorded motion data. It must be reviewed, edited, and approved by the commission secretary before distribution.</span>
+      </div>
+      <div class="minutes-box" id="minutes-box" style="height:300px"></div>
+      <div style="display:flex;gap:6px;margin-top:8px;opacity:0" id="minutes-btns">
+        <div class="btn-s btn-s-outline">
+          <svg viewBox="0 0 14 14" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="4" y="1" width="9" height="11" rx="1"/><path d="M1 4v8a1 1 0 001 1h7"/></svg>
+          Copy to Clipboard
+        </div>
+        <div class="btn-s btn-s-outline">
+          <svg viewBox="0 0 14 14" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M7 1v8m-3-3l3 3 3-3M2 11v2h10v-2"/></svg>
+          Download as .txt
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Scene 5: KPI Dashboard ── -->
+    <div class="scene" id="scene-5">
+      <div class="s-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <h2 style="margin:0">KPI Dashboard</h2>
+          <div style="padding:4px 10px;border:1px solid var(--border);border-radius:4px;font-size:.7rem;background:#fff">2026</div>
+        </div>
+        <div class="kpi-grid" id="kpi-grid">
+          <div class="kpi-card"><div class="kpi-num" data-target="18">0</div><div class="kpi-label">Total Reviewed</div></div>
+          <div class="kpi-card"><div class="kpi-num" data-target="83" data-suffix="%">0%</div><div class="kpi-label">Approval Rate</div></div>
+          <div class="kpi-card"><div class="kpi-num" data-target="71" data-suffix="%">0%</div><div class="kpi-label">Avg Completeness</div></div>
+          <div class="kpi-card"><div class="kpi-num" data-target="11">0</div><div class="kpi-label">Meetings Held</div></div>
+          <div class="kpi-card"><div class="kpi-num" data-target="100" data-suffix="%">0%</div><div class="kpi-label">Quorum Rate</div></div>
+          <div class="kpi-card"><div class="kpi-num" data-target="67" data-suffix="%">0%</div><div class="kpi-label">Training Compliance</div></div>
+        </div>
+
+        <div style="font-size:.7rem;font-weight:600;margin-bottom:4px;color:var(--text-secondary)">Outcome Distribution</div>
+        <div class="outcome-bar" id="outcome-bar">
+          <div style="width:0%;background:#2D6A4F" data-w="58">58%</div>
+          <div style="width:0%;background:#8B6914" data-w="25">25%</div>
+          <div style="width:0%;background:#5A5A5A" data-w="11">11%</div>
+          <div style="width:0%;background:#9B2335" data-w="6">6%</div>
+        </div>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-dot" style="background:#2D6A4F"></span>Approved</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#8B6914"></span>Approved w/ Conditions</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#5A5A5A"></span>Tabled</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#9B2335"></span>Denied</span>
+        </div>
+
+        <hr style="margin:10px 0;border:none;border-top:1px solid var(--border-light)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:.72rem;font-weight:600;color:var(--nav)">SHPO Annual Report</div>
+            <div style="font-size:.55rem;color:var(--text-secondary)">Rivermont HPC — Downloads as .docx — includes all 2026 session data, attendance, and training records</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <div style="padding:4px 8px;border:1px solid var(--border);border-radius:4px;font-size:.62rem;background:#fff">2026</div>
+            <div class="btn-s btn-s-primary">Generate SHPO Report</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /scene-area -->
+
+  <!-- Scene controls -->
+  <div class="controls">
+    <button class="ctrl-arrow" id="prev-btn"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <div class="controls-center">
+      <div class="scene-title" id="scene-title">AI COA Review</div>
+      <div class="scene-dots" id="scene-dots">
+        <div class="scene-dot active" data-scene="0"></div>
+        <div class="scene-dot" data-scene="1"></div>
+        <div class="scene-dot" data-scene="2"></div>
+        <div class="scene-dot" data-scene="3"></div>
+        <div class="scene-dot" data-scene="4"></div>
+      </div>
+      <div class="dot-labels">
+        <span class="dot-label active">Review</span>
+        <span class="dot-label">Property</span>
+        <span class="dot-label">Meeting</span>
+        <span class="dot-label">Minutes</span>
+        <span class="dot-label">Settings</span>
+      </div>
+    </div>
+    <button class="ctrl-arrow" id="next-btn"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
+  </div>
+
+</div><!-- /widget -->
+
+<script>
+(function(){
+'use strict';
+
+const scenes = [
+  { id:1, duration:6000, tab:'review',   label:'AI COA Review' },
+  { id:2, duration:5000, tab:'property', label:'Property Intelligence' },
+  { id:3, duration:6000, tab:'meeting',  label:'Live Meeting' },
+  { id:4, duration:5000, tab:'minutes',  label:'Minutes Draft' },
+  { id:5, duration:5000, tab:'settings', label:'KPI Dashboard' },
+];
+
+let current = 0;
+let timer = null;
+let progressRAF = null;
+let progressStart = 0;
+let progressElapsed = 0;
+let paused = false;
+let sceneState = {};
+
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+// ── Nav tab highlighting ──
+function setActiveTab(tabName) {
+  $$('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
+}
+
+// ── Progress bar ──
+function startProgress(duration) {
+  const fill = $('#progress-fill');
+  progressStart = performance.now();
+  progressElapsed = 0;
+  fill.style.width = '0%';
+  cancelAnimationFrame(progressRAF);
+  function tick(now) {
+    if (paused) { progressRAF = requestAnimationFrame(tick); return; }
+    const elapsed = progressElapsed + (now - progressStart);
+    const pct = Math.min((elapsed / duration) * 100, 100);
+    fill.style.width = pct + '%';
+    if (pct < 100) progressRAF = requestAnimationFrame(tick);
+  }
+  progressRAF = requestAnimationFrame(tick);
+}
+
+// ── Scene switching ──
+function goTo(idx, manual) {
+  if (idx === current && !manual) return;
+  cancelScene();
+  const oldEl = $(`#scene-${scenes[current].id}`);
+  const newIdx = ((idx % scenes.length) + scenes.length) % scenes.length;
+  const newEl = $(`#scene-${scenes[newIdx].id}`);
+
+  oldEl.classList.add('exiting');
+  oldEl.classList.remove('active');
+
+  setTimeout(() => {
+    oldEl.classList.remove('exiting');
+    current = newIdx;
+    setActiveTab(scenes[current].tab);
+    $('#scene-title').textContent = scenes[current].label;
+    // Update dots
+    $$('.scene-dot').forEach((d,i) => d.classList.toggle('active', i === current));
+    $$('.dot-label').forEach((d,i) => d.classList.toggle('active', i === current));
+    newEl.classList.add('active');
+    startProgress(scenes[current].duration);
+    initScene(current);
+    scheduleNext();
+  }, 60);
+}
+
+function scheduleNext() {
+  clearTimeout(timer);
+  timer = setTimeout(() => { if (!paused) goTo(current + 1); }, scenes[current].duration);
+}
+
+function cancelScene() {
+  clearTimeout(timer);
+  cancelAnimationFrame(progressRAF);
+  // Cancel scene-specific intervals
+  if (sceneState.interval) { clearInterval(sceneState.interval); sceneState.interval = null; }
+  if (sceneState.raf) { cancelAnimationFrame(sceneState.raf); sceneState.raf = null; }
+}
+
+// ── Pause on hover ──
+const widget = $('#widget');
+widget.addEventListener('mouseenter', () => {
+  paused = true;
+  clearTimeout(timer);
+  progressElapsed += performance.now() - progressStart;
+  $('#pause-ind').style.display = 'block';
+});
+widget.addEventListener('mouseleave', () => {
+  paused = false;
+  progressStart = performance.now();
+  $('#pause-ind').style.display = 'none';
+  const remaining = scenes[current].duration - progressElapsed;
+  if (remaining > 0) {
+    startProgress(scenes[current].duration);
+    // Hack: fast-forward progress to current elapsed
+    timer = setTimeout(() => { if (!paused) goTo(current + 1); }, remaining);
+  } else {
+    goTo(current + 1);
+  }
+});
+
+// ── Controls ──
+$('#prev-btn').addEventListener('click', () => goTo(current - 1, true));
+$('#next-btn').addEventListener('click', () => goTo(current + 1, true));
+$$('.scene-dot').forEach(d => {
+  d.addEventListener('click', () => goTo(parseInt(d.dataset.scene), true));
+});
+
+// ── Scene init functions ──
+function initScene(idx) {
+  sceneState = {};
+  switch(idx) {
+    case 0: initReview(); break;
+    case 1: initProperty(); break;
+    case 2: initMeeting(); break;
+    case 3: initMinutes(); break;
+    case 4: initKPI(); break;
+  }
+}
+
+function initReview() {
+  // Reset
+  const fill = $('#completeness-fill');
+  const scoreText = $('#score-text');
+  fill.style.width = '0%';
+  fill.textContent = '0%';
+  scoreText.textContent = '0%';
+  $('#review-result-card').style.opacity = '0';
+  $$('#issues-list .issue-item').forEach(el => el.style.opacity = '0');
+  $('#draft-email-btn-demo').style.animation = 'none';
+
+  // Animate completeness bar
+  setTimeout(() => {
+    fill.style.width = '68%';
+    fill.textContent = '68%';
+    scoreText.textContent = '68%';
+  }, 100);
+
+  // Fade in review result
+  setTimeout(() => { $('#review-result-card').style.opacity = '1'; $('#review-result-card').style.transition = 'opacity .4s'; }, 300);
+
+  // Stagger issues
+  const issues = $$('#issues-list .issue-item');
+  issues.forEach((el, i) => {
+    setTimeout(() => { el.style.opacity = '1'; el.style.transition = 'opacity .3s'; }, 500 + i * 100);
+  });
+
+  // Pulse draft email button after 4s
+  setTimeout(() => {
+    $('#draft-email-btn-demo').style.animation = 'pulse-btn 1.5s ease-in-out 3';
+  }, 4000);
+}
+
+function initProperty() {
+  // Reset map buildings
+  const buildings = $$('.map-building');
+  buildings.forEach(b => { b.style.opacity = '0'; b.style.transition = 'none'; });
+
+  // Fade in map
+  const map = $('#prop-map');
+  map.style.opacity = '0';
+  map.style.transition = 'opacity .4s';
+  setTimeout(() => { map.style.opacity = '1'; }, 50);
+
+  // Stagger buildings
+  buildings.forEach((b, i) => {
+    setTimeout(() => { b.style.transition = 'opacity .3s'; b.style.opacity = '1'; }, 200 + i * 120);
+  });
+
+  // Stagger history rows
+  const rows = $$('#hist-rows .hist-row');
+  rows.forEach((r, i) => {
+    r.style.opacity = '0';
+    r.style.transition = 'none';
+    setTimeout(() => { r.style.transition = 'opacity .3s, transform .3s'; r.style.opacity = '1'; }, 500 + i * 150);
+  });
+}
+
+function initMeeting() {
+  // Reset vote counter
+  const voteEl = $('#vote-yes');
+  voteEl.textContent = '0';
+
+  // Reset steps
+  const steps = $$('#motion-steps .step-indicator');
+  steps.forEach(s => { s.style.opacity = '0'; s.style.transition = 'none'; });
+
+  // Reset approved button animation
+  const approvedBtn = $('#approved-btn');
+  approvedBtn.style.animation = 'none';
+
+  // Stagger step indicators
+  steps.forEach((s, i) => {
+    setTimeout(() => { s.style.transition = 'opacity .3s'; s.style.opacity = '1'; }, 200 + i * 200);
+  });
+
+  // Animate vote counter 0 -> 5
+  let voteStart = null;
+  function animateVote(ts) {
+    if (!voteStart) voteStart = ts;
+    const t = Math.min((ts - voteStart) / 1000, 1);
+    voteEl.textContent = Math.round(t * 5);
+    if (t < 1) sceneState.raf = requestAnimationFrame(animateVote);
+  }
+  setTimeout(() => { sceneState.raf = requestAnimationFrame(animateVote); }, 600);
+
+  // Pulse approved button
+  setTimeout(() => {
+    approvedBtn.style.animation = 'pulse-outcome 2s ease-in-out infinite';
+  }, 1000);
+}
+
+function initMinutes() {
+  const box = $('#minutes-box');
+  const btns = $('#minutes-btns');
+  box.textContent = '';
+  btns.style.opacity = '0';
+
+  const fullText = `RIVERMONT HISTORIC PRESERVATION COMMISSION
+CERTIFICATE OF APPROPRIATENESS REVIEW MEETING
+Tuesday, April 15, 2026
+
+MEMBERS PRESENT: C. Hargrove (Chair), M. Delacroix (Vice Chair), B. Okafor (Secretary), S. Novak, T. Whitfield
+
+MEMBERS ABSENT: R. Patel
+
+CALL TO ORDER: Meeting called to order at 7:04 PM by Chair Hargrove.
+
+APPROVAL OF PRIOR MINUTES: Motion to approve the minutes of March 18, 2026 by M. Delacroix, seconded by S. Novak. Carried 5-0.
+
+NEW BUSINESS:
+
+APPLICATION COA-2026-014
+Property: 312 Elm Street (Alcott House)
+Applicant: J. Morrow
+Project: Front porch column replacement
+
+Motion 1 \u2014 Completeness: C. Hargrove moved that the application is complete. Seconded by M. Delacroix. Vote: 5-0. Motion carried.
+
+Motion 2 \u2014 Classification: C. Hargrove moved to classify the work as Minor. Seconded by B. Okafor. Vote: 5-0. Motion carried.
+
+Motion 3 \u2014 Decision: C. Hargrove moved to Approve with Conditions. Seconded by M. Delacroix. Vote: 5-0. Motion carried.
+
+Conditions: Replacement columns shall match existing profile and capital detail in wood only. Material samples required prior to installation.
+
+ADJOURNMENT: Meeting adjourned at 7:52 PM.
+
+Respectfully submitted,
+____________________________
+B. Okafor, Secretary`;
+
+  let idx = 0;
+  const speed = 35; // chars per second
+  const msPerChar = 1000 / speed;
+
+  setTimeout(() => {
+    sceneState.interval = setInterval(() => {
+      if (idx < fullText.length) {
+        box.textContent = fullText.substring(0, ++idx);
+        box.scrollTop = box.scrollHeight;
+      } else {
+        clearInterval(sceneState.interval);
+        sceneState.interval = null;
+        btns.style.opacity = '1';
+        btns.style.transition = 'opacity .3s';
+      }
+    }, msPerChar);
+  }, 400);
+}
+
+function initKPI() {
+  // Reset stat cards
+  const nums = $$('#kpi-grid .kpi-num');
+  nums.forEach(n => { n.textContent = n.dataset.suffix ? '0' + n.dataset.suffix : '0'; });
+
+  // Reset outcome bar
+  $$('#outcome-bar div').forEach(d => { d.style.width = '0%'; d.style.transition = 'none'; });
+
+  // Count-up animation
+  const duration = 1400;
+  const ease = t => 1 - Math.pow(1 - t, 3);
+  let start = null;
+
+  function tick(ts) {
+    if (!start) start = ts;
+    const t = Math.min((ts - start) / duration, 1);
+    const eased = ease(t);
+    nums.forEach((n, i) => {
+      setTimeout(() => {
+        const target = parseInt(n.dataset.target);
+        const val = Math.round(eased * target);
+        n.textContent = n.dataset.suffix ? val + n.dataset.suffix : val;
+      }, i * 80);
+    });
+    if (t < 1) sceneState.raf = requestAnimationFrame(tick);
+  }
+  sceneState.raf = requestAnimationFrame(tick);
+
+  // Outcome bar
+  setTimeout(() => {
+    $$('#outcome-bar div').forEach(d => {
+      d.style.transition = 'width 1s ease-out';
+      d.style.width = d.dataset.w + '%';
+    });
+  }, 200);
+}
+
+// ── Init ──
+setActiveTab(scenes[0].tab);
+startProgress(scenes[0].duration);
+initScene(0);
+scheduleNext();
+
+})();
+</script>
+</body>
+</html>
