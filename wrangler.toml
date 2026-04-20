@@ -1,6 +1,8 @@
 name = "districtdesk-marketing"
+main = "src/index.js"
 compatibility_date = "2024-09-23"
 
 [assets]
 directory = "./"
-exclude = [".git", ".wrangler", "node_modules", ".gitignore", "package.json", "package-lock.json", "wrangler.toml", "CLOUDFLARE_EMAIL_SETUP.md"]
+binding = "ASSETS"
+exclude = [".git/**", ".wrangler/**", ".github/**", "node_modules/**", ".gitignore", "package.json", "package-lock.json", "wrangler.toml", "CLOUDFLARE_EMAIL_SETUP.md", "src/**"]
