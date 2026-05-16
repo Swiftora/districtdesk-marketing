@@ -1,0 +1,35 @@
+name: Forbidden strings check
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan for forbidden strings
+        run: |
+          set -e
+          PATTERN='Mullica|Harrison Township|Paul Showers|Ernie Miller|Dave Tinny|Jason Flowers|Sharron Patterson|Gaunt House|14 South Main|14 S\. Main|48 N\. Main|Jane Smith|J\. Williams'
+          FOUND=0
+          # Check HTML files with comments stripped (the guardrail comment documents forbidden strings)
+          for f in $(find . -name '*.html'); do
+            if sed '/<!--/,/-->/d' "$f" | grep -En "$PATTERN"; then
+              echo "  ^ in: $f"
+              FOUND=1
+            fi
+          done
+          # Check markdown and text files
+          if grep -rEn --include='*.md' --include='*.txt' "$PATTERN" .; then
+            FOUND=1
+          fi
+          if [ "$FOUND" = "1" ]; then
+            echo ""
+            echo "ERROR: Forbidden identifying strings found in repo."
+            echo "This repo is a public marketing site and must not contain real commissioner or district names."
+            echo "See the warning comment at the top of index.html for the list of fictitious placeholders to use instead."
+            exit 1
+          fi
+          echo "OK — no forbidden strings found."
